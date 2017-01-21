@@ -6,7 +6,7 @@ from astroid import MANAGER
 from pylint.reporters.text import TextReporter
 from subprocess import Popen, PIPE, STDOUT
 '''
-
+TEMPLATES_AUTO_RELOAD = True
 app = Flask(__name__)
 app.debug = True 
 
