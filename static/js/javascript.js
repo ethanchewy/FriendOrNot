@@ -12,24 +12,29 @@ window.fbAsyncInit = function() {
         if (response.status === 'connected') {
         	
           // Logged into your app and Facebook.
+          
           FB.api('/me/taggable_friends?limit=5000', function(response) {
 	          console.log(response);
-	          displayFriends(response);
+	          //displayFriends(response);
+	          displayMutualFriends(response);
 	      });
+	      
 
-	      FB.api('/me/feed', function(response) {
-	          console.log(response);
+	      FB.api('/me/feed?limit=5000', function(response) {
+	          //console.log(response);
 	          displayPostLikes(response);
 	          displayPostReactions(response);
-	          //displayPostComments(response);
+	          
+	          displayPostComments(response);
 	      });
 	      
-	      
+	      /*
 	      FB.api('/me/inbox', function(response) {
 	          console.log(response);
 	          //displayPostLikes(response);
 	
 	      });
+	      */
         } else if (response.status === 'not_authorized') {
           // The person is logged into Facebook, but not your app.
         } else {
@@ -86,41 +91,70 @@ function displayFeed(response){
 }
 
 function displayPostLikes(response){
+	var total ={items:[]};
 	for (var i in response.data) {
 		FB.api(
 		    "/" + response.data[i].id + "/likes",
 		    function (response) {
 		      if (response && !response.error) {
 		        /* handle the result */
-		        console.log(response);
+		        total.items.push(response);
 		      }
 		    }
 		);
         
     }
+    console.log("displayPostLikes");
+    console.log(total);
 	console.log();
 }
 
 function displayPostReactions(response){
+	var total ={items:[]};
 	for (var i in response.data) {
 		FB.api(
 		    "/" + response.data[i].id + "/reactions",
 		    function (response) {
 		      if (response && !response.error) {
 		        /* handle the result */
-		        console.log(response);
+		        total.items.push(response);
 		      }
 		    }
 		);
         
     }
+    console.log("displayPostReactions");
+    console.log(total);
 	console.log();
 }
 
 function displayPostComments(response){
+	var total ={items:[]};
 	for (var i in response.data) {
 		FB.api(
 		    "/" + response.data[i].id + "/comments",
+		    function (response) {
+		      if (response && !response.error) {
+		        /* handle the result */
+		        total.items.push(response);
+		      }
+		    }
+		);
+        
+    }
+    //YOU CAN ACCESS USER'S ID THROUGH "FROM" OBJECT
+	console.log("displayPostComments");
+    console.log(total);
+	console.log();
+}
+
+function displayMutualFriends(response){
+	for (var i in response.data) {
+		FB.api(
+		    "/" + response.data[i].id,
+		    {
+		        "fields": "context.fields(all_mutual_friends.limit(100))"
+		    },
 		    function (response) {
 		      if (response && !response.error) {
 		        /* handle the result */
@@ -130,7 +164,6 @@ function displayPostComments(response){
 		);
         
     }
-    //YOU CAN ACCESS USER'S ID THROUGH "FROM" OBJECT
 	console.log();
 }
 
