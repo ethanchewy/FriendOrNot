@@ -1,0 +1,56 @@
+<html>
+<head>
+  <script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
+</head>
+<body>
+
+
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1778865799042954',
+      xfbml      : true,
+      version    : 'v2.8'
+    });
+    FB.AppEvents.logPageView();
+    $( document ).ready(function() {
+        FB.login(function(response) {
+        if (response.status === 'connected') {
+          // Logged into your app and Facebook.
+          FB.api('/me', {fields: 'last_name'}, function(response) {
+          console.log(response);
+        });
+        } else if (response.status === 'not_authorized') {
+          // The person is logged into Facebook, but not your app.
+        } else {
+          // The person is not logged into Facebook, so we're not sure if
+          // they are logged into this app or not.
+        }
+      });
+
+
+    });
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+<div
+  class="fb-like"
+  data-share="true"
+  data-width="450"
+  data-show-faces="true">
+</div>
+<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+</fb:login-button>
+<script src="js/script.js"></script>
+</body>
+</html>
