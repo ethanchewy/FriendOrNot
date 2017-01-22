@@ -12,20 +12,24 @@ window.fbAsyncInit = function() {
         if (response.status === 'connected') {
         	
           // Logged into your app and Facebook.
-          
+          var friends;
           FB.api('/me/taggable_friends?limit=5000', function(response) {
 	          console.log(response);
-	          //displayFriends(response);
-	          displayMutualFriends(response);
+	          displayFriends(response);
+	          friends = response;
+	          //displayMutualFriends(response);
 	      });
 	      
-
+          
 	      FB.api('/me/feed?limit=5000', function(response) {
 	          //console.log(response);
-	          displayPostLikes(response);
-	          displayPostReactions(response);
+	          //displayPostLikes(response);
+	          var reactions = displayPostReactions(response);
 	          
-	          displayPostComments(response);
+	          var comments = displayPostComments(response);
+	          //var list = 
+	          displayTotalScoreComments(reactions, comments, friends);
+
 	      });
 	      
 	      /*
@@ -73,11 +77,11 @@ function displayFriends(id){
 function displayFriends(response){
 	var output="<ul>";
     for (var i in response.data) {
-        output+="<li>NAME : " + response.data[i].name + "<br/>ID : " + response.data[i].id + "</li>";
+        output+="<img href=" + ">"+"</img>"+"<li>NAME : " + response.data[i].name + "<br/>ID : " + response.data[i].id + "</li>";
     }
 
     output+="</ul>";
-    document.getElementById("placeholder").innerHTML=output;
+    document.getElementById("friend_score").innerHTML=output;
 }
 
 function displayFeed(response){
@@ -89,26 +93,41 @@ function displayFeed(response){
     output+="</ul>";
     document.getElementById("placeholder").innerHTML=output;
 }
-
+/*
 function displayPostLikes(response){
 	var total ={items:[]};
+	var output="<pre>"
 	for (var i in response.data) {
 		FB.api(
 		    "/" + response.data[i].id + "/likes",
 		    function (response) {
 		      if (response && !response.error) {
-		        /* handle the result */
 		        total.items.push(response);
+		        output+=JSON.stringify(response);
 		      }
 		    }
 		);
         
     }
+    output+="</pre>";
+    document.getElementById("placeholder").innerHTML=output;
     console.log("displayPostLikes");
     console.log(total);
 	console.log();
 }
-
+*/
+var convArrToObj = function(array){
+    var thisEleObj = new Object();
+    if(typeof array == "object"){
+        for(var i in array){
+            var thisEle = convArrToObj(array[i]);
+            thisEleObj[i] = thisEle;
+        }
+    }else {
+        thisEleObj = array;
+    }
+    return thisEleObj;
+}
 function displayPostReactions(response){
 	var total ={items:[]};
 	for (var i in response.data) {
@@ -118,14 +137,18 @@ function displayPostReactions(response){
 		      if (response && !response.error) {
 		        /* handle the result */
 		        total.items.push(response);
+		        //console.log(Object.prototype.toString.call(response));
 		      }
 		    }
 		);
         
     }
-    console.log("displayPostReactions");
-    console.log(total);
+    //console.log("displayPostReactions");
+    //console.log(total);
 	console.log();
+	console.log(Object.prototype.toString.call(total));
+	console.log(convArrToObj(total));
+	return total;
 }
 
 function displayPostComments(response){
@@ -137,17 +160,45 @@ function displayPostComments(response){
 		      if (response && !response.error) {
 		        /* handle the result */
 		        total.items.push(response);
+		        //console.log(Object.prototype.toString.call(response));
 		      }
 		    }
 		);
         
     }
     //YOU CAN ACCESS USER'S ID THROUGH "FROM" OBJECT
-	console.log("displayPostComments");
-    console.log(total);
-	console.log();
+	//console.log("displayPostComments");
+    //console.log(total);
+	console.log(Object.prototype.toString.call(total));
+	console.log(convArrToObj(total));
+	return total;
 }
+function displayTotalScoreComments(reactions, comments, friends){
+	post_likes = reactions;
+	post_comments = comments;
+	friends_list = friends;
+	//console.log(displaytTOtalScoreComments);
+	/*
+	console.log("friends_list");
+	console.log(friends);
+	console.log("post_list_likes");
+	console.log(post_likes);
+	console.log("post_list_comments");
+	console.log(post_comments);
+	*/
+	$.getJSON('/test_model', {
+		//friends: friends_list,
+      	post_list_likes :  post_likes,
+      	post_list_comments: post_comments
+    }, function(data) {
+    	console.log(data);
+    	current_text = data;
+    	return false;
+    });
+    
 
+}
+/*
 function displayMutualFriends(response){
 	for (var i in response.data) {
 		FB.api(
@@ -157,16 +208,18 @@ function displayMutualFriends(response){
 		    },
 		    function (response) {
 		      if (response && !response.error) {
-		        /* handle the result */
+
 		        console.log(response);
 		      }
 		    }
 		);
         
     }
+    console.log("displayMutualFriends");
+
 	console.log();
 }
-
+*/
 
 //messages
 //mutual likes
